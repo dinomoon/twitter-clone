@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
+import { Route, useHistory } from 'react-router-dom';
+import { authService } from './fbase';
+import HomePage from './pages/HomePage';
+import MainPage from './pages/MainPage';
 
 function App() {
+  const history = useHistory();
+  useEffect(() => {
+    authService.onAuthStateChanged((user) => {
+      if (user) {
+        history.push('/home');
+      } else {
+        history.push('/');
+      }
+    });
+  });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Route path="/" component={MainPage} exact />
+      <Route path="/home" component={HomePage} exact />
+    </>
   );
 }
 
