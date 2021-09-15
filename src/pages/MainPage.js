@@ -4,6 +4,7 @@ import { firebaseInstance, authService } from '../fbase';
 import oc from 'open-color';
 import palette from '../lib/styles/palette';
 import { useHistory } from 'react-router';
+import { darken } from 'polished';
 
 const Wrapper = styled.main`
   display: flex;
@@ -22,7 +23,7 @@ const Left = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${palette.nwitter[0]};
+  background-color: ${palette.nwitter};
   img {
     z-index: 1;
   }
@@ -43,7 +44,7 @@ const Right = styled.div`
   .wrapper {
     .twitter-svg {
       height: 3rem;
-      fill: ${palette.nwitter[0]};
+      fill: ${palette.nwitter};
     }
     padding: 40px;
     h1 {
@@ -85,7 +86,7 @@ const Right = styled.div`
       margin-bottom: 20px;
     }
     span.emphasize {
-      color: ${palette.nwitter[0]};
+      color: ${palette.nwitter};
       &:hover {
         text-decoration: underline;
       }
@@ -144,7 +145,7 @@ const Modal = styled.div`
     margin-bottom: 50px;
     svg {
       width: 32px;
-      fill: ${palette.nwitter[0]};
+      fill: ${palette.nwitter};
     }
     .close {
       width: 40px;
@@ -173,17 +174,21 @@ const Modal = styled.div`
       border: 1px solid ${oc.gray[4]};
       border-radius: 4px;
       &:focus {
-        outline-color: ${palette.nwitter[0]};
+        outline-color: ${palette.nwitter};
       }
     }
     button {
       bottom: 20px;
       width: 100%;
       height: 42px;
-      background-color: ${palette.nwitter[0]};
+      background-color: ${palette.nwitter};
       color: #fff;
       font-weight: bold;
       font-size: 15px;
+      transition: all 0.2s;
+      &:hover {
+        background-color: ${darken(0.05, palette.nwitter)};
+      }
     }
   }
 `;

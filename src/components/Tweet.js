@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import oc from 'open-color';
+import palette from '../lib/styles/palette';
 
 const Wrapper = styled.div`
+  position: relative;
   padding: 14px 10px 10px 16px;
-  border-bottom: 1px solid rgb(239, 243, 244);
+  border-bottom: 1px solid ${palette.borderColor};
   display: flex;
   font-size: 15px;
   cursor: pointer;
@@ -49,9 +51,9 @@ const Wrapper = styled.div`
           fill: ${oc.gray[6]};
         }
         &:hover {
-          background-color: ${oc.blue[0]};
+          background-color: ${oc.orange[0]};
           svg {
-            fill: ${oc.blue[7]};
+            fill: ${oc.orange[7]};
           }
         }
       }
@@ -75,15 +77,15 @@ const Wrapper = styled.div`
           fill: ${oc.gray[7]};
         }
         &:hover {
-          background-color: ${oc.blue[0]};
+          background-color: ${oc.orange[0]};
           svg {
-            fill: ${oc.blue[7]};
+            fill: ${palette.nwitter[0]};
           }
         }
       }
       div.retweet {
         &:hover {
-          background-color: ${oc.green[1]};
+          background-color: ${oc.green[0]};
           svg {
             fill: ${oc.green[7]};
           }
@@ -101,9 +103,28 @@ const Wrapper = styled.div`
   }
 `;
 
-const Tweet = ({ tweet }) => {
+const MoreModal = styled.div`
+  position: absolute;
+  right: 0;
+  width: 350px;
+  border-radius: 6px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background-color: #fff;
+  font-size: 15px;
+  z-index: 9999;
+  div {
+    height: 52px;
+  }
+`;
+
+const Tweet = ({ tweet, handleTab, tabState }) => {
   return (
     <Wrapper>
+      {tabState.more && (
+        <MoreModal>
+          <div>Delete</div>
+        </MoreModal>
+      )}
       <div className="left">
         <img src={tweet.img} alt="" className="border--radius__max" />
       </div>
@@ -113,7 +134,11 @@ const Tweet = ({ tweet }) => {
             <span className="name">{tweet.name}</span>
             <span className="id">@{tweet.creatorId}</span>
           </div>
-          <span className="more border--radius__max" aria-label="More">
+          <span
+            id={tweet.id}
+            className="more border--radius__max"
+            onClick={(e) => handleTab(e, 'more', tweet.id)}
+          >
             <svg viewBox="0 0 24 24">
               <g>
                 <circle cx="5" cy="12" r="2"></circle>

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { authService } from '../fbase';
 import oc from 'open-color';
 import palette from '../lib/styles/palette';
+import { darken } from 'polished';
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,7 +14,7 @@ const Wrapper = styled.div`
   svg {
     width: 40px;
     height: 40px;
-    fill: ${palette.nwitter[0]};
+    fill: ${palette.nwitter};
   }
   input {
     display: block;
@@ -24,20 +25,20 @@ const Wrapper = styled.div`
     border: 1px solid ${oc.gray[4]};
     border-radius: 4px;
     &:focus {
-      outline-color: ${palette.nwitter[0]};
+      outline-color: ${palette.nwitter};
     }
   }
   button {
     bottom: 20px;
     width: 100%;
     height: 50px;
-    background-color: ${palette.nwitter[0]};
+    background-color: ${palette.nwitter};
     color: #fff;
     font-weight: bold;
     font-size: 15px;
     transition: all 0.2s;
     &:hover {
-      background-color: ${palette.nwitter[1]};
+      background-color: ${darken(0.05, palette.nwitter)};
     }
   }
 `;

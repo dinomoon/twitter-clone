@@ -42,3 +42,21 @@ a {
   border: none;
   cursor: pointer;
 }
+
+#modal-background {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+}
+
+#modal-background.show {
+  display: block;
+}
+
+#modal-background.shadow {
+  background-color: rgba(0, 0, 0, 0.4);
+}
