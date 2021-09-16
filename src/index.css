@@ -50,7 +50,6 @@ a {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 9998;
 }
 
 #modal-background.show {
@@ -59,4 +58,20 @@ a {
 
 #modal-background.shadow {
   background-color: rgba(0, 0, 0, 0.4);
+}
+
+#modal-background.nweet-modal-bg {
+  z-index: 9001;
+}
+
+#modal-background.user-modal-bg {
+  z-index: 8999;
+}
+
+#nweet-modal {
+  z-index: 9999;
+}
+
+#user-modal {
+  z-index: 9999;
 }

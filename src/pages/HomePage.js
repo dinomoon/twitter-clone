@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { authService, dbService } from '../fbase';
 import Tweet from '../components/Tweet';
 import palette from '../lib/styles/palette';
-import { darken } from 'polished';
 import Button from '../components/common/Button';
 
 // common
@@ -79,10 +78,7 @@ const NweetForm = styled.div`
       button {
         width: 76px;
         height: 36px;
-        color: #fff;
         font-size: 15px;
-        font-weight: bold;
-        background-color: ${palette.nwitter};
       }
     }
   }
@@ -123,6 +119,7 @@ const Header = styled.header`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  z-index: 9000;
   h1 {
     display: flex;
     justify-content: center;
@@ -182,18 +179,9 @@ const Header = styled.header`
 
   .tweet-btn {
     width: 85%;
-    padding: 14px 0;
+    height: 52px;
     margin-top: 1rem;
-    text-align: center;
-    color: #fff;
-    font-weight: bold;
     font-size: 17px;
-    cursor: pointer;
-    background-color: ${palette.nwitter};
-    transition: all 0.2s;
-    &:hover {
-      background-color: ${darken(0.05, palette.nwitter)};
-    }
   }
   .header-bottom {
     display: flex;
@@ -268,16 +256,15 @@ const Main = styled.main`
 
 // Modal
 const UserModal = styled.div`
-  width: 298px;
+  width: 300px;
   height: 200px;
+  margin-left: -18px;
   position: fixed;
   bottom: 90px;
-  left: 90px;
   border-radius: 20px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   background-color: #fff;
   font-size: 15px;
-  z-index: 9999;
   .top {
     display: flex;
     align-items: center;
@@ -314,7 +301,6 @@ const NweetModal = styled.div`
   width: 600px;
   height: 280px;
   background-color: #fff;
-  z-index: 9999;
   border-radius: 20px;
   .close {
     padding: 15px;
@@ -358,6 +344,10 @@ const HomePage = ({ user }) => {
   }, []);
 
   const handleTweet = async () => {
+    if (tabState.nweet) {
+      handleTab('nweet');
+    }
+    setTweet('');
     await dbService.collection('tweets').add({
       text: tweet,
       createdAt: new Date(),
@@ -365,23 +355,28 @@ const HomePage = ({ user }) => {
       img: user.img,
       name: user.name,
     });
-    setTweet('');
   };
 
-  const handleTab = (e, type, id) => {
-    const $modalBackground = document.querySelector('#modal-background');
-    $modalBackground.classList.toggle('show');
+  const handleTab = (type) => {
+    let $modalBackground;
 
-    if (!type) {
-      for (let x in tabState) {
-        if (tabState[x]) {
-          type = x;
-        }
-      }
-    }
-
-    if (type === 'nweet') {
-      $modalBackground.classList.toggle('shadow');
+    switch (type) {
+      case 'user':
+        $modalBackground = document.querySelector('.user-modal-bg');
+        $modalBackground.classList.toggle('show');
+        break;
+      case 'nweet':
+        $modalBackground = document.querySelector('.nweet-modal-bg');
+        $modalBackground.classList.toggle('show');
+        $modalBackground.classList.toggle('shadow');
+        setTweet('');
+        break;
+      case 'more':
+        $modalBackground = document.querySelector('.more-modal-bg');
+        $modalBackground.classList.toggle('show');
+        break;
+      default:
+        return;
     }
 
     setTabState((prev) => ({
@@ -404,35 +399,27 @@ const HomePage = ({ user }) => {
 
   return (
     <>
-      <div id="modal-background" onClick={(e) => handleTab(e)}></div>
-      {tabState.user && (
-        <UserModal>
-          <div className="top">
-            <img src={user.img} alt="" className="border--radius__max" />
-            <UserInfo className="userinfo">
-              <div className="name">{user.name}</div>
-              <div className="uid">@{user.uid.substr(0, 10)}...</div>
-            </UserInfo>
-            <svg viewBox="0 0 24 24">
-              <g>
-                <path d="M9 20c-.264 0-.52-.104-.707-.293l-4.785-4.785c-.39-.39-.39-1.023 0-1.414s1.023-.39 1.414 0l3.946 3.945L18.075 4.41c.32-.45.94-.558 1.395-.24.45.318.56.942.24 1.394L9.817 19.577c-.17.24-.438.395-.732.42-.028.002-.057.003-.085.003z"></path>
-              </g>
-            </svg>
-          </div>
-          <div className="bottom">
-            <div>Add an existing account</div>
-            <div onClick={() => authService.signOut()}>
-              Log out @{user.uid.substr(0, 18)}...
-            </div>
-          </div>
-        </UserModal>
-      )}
+      <div
+        id="modal-background"
+        className="nweet-modal-bg"
+        onClick={() => handleTab('nweet')}
+      ></div>
+      <div
+        id="modal-background"
+        className="user-modal-bg"
+        onClick={() => handleTab('user')}
+      ></div>
+      <div
+        id="modal-background"
+        className="more-modal-bg"
+        onClick={() => handleTab('more')}
+      ></div>
       {tabState.nweet && (
-        <NweetModal>
+        <NweetModal id="nweet-modal">
           <div className="close">
             <span
               className="border--radius__max"
-              onClick={(e) => handleTab(e, 'nweet')}
+              onClick={() => handleTab('nweet')}
             >
               <svg viewBox="0 0 24 24">
                 <g>
@@ -502,14 +489,14 @@ const HomePage = ({ user }) => {
                   </div>
                 </div>
                 <div>
-                  <button
+                  <Button
                     type="button"
                     className="default-btn border--radius__max"
                     onClick={handleTweet}
                     disabled={!tweet}
                   >
                     Nweet
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -519,6 +506,28 @@ const HomePage = ({ user }) => {
       <Wrapper>
         {/* Header */}
         <Header role="banner">
+          {tabState.user && (
+            <UserModal id="user-modal">
+              <div className="top">
+                <img src={user.img} alt="" className="border--radius__max" />
+                <UserInfo className="userinfo">
+                  <div className="name">{user.name}</div>
+                  <div className="uid">@{user.uid.substr(0, 10)}...</div>
+                </UserInfo>
+                <svg viewBox="0 0 24 24">
+                  <g>
+                    <path d="M9 20c-.264 0-.52-.104-.707-.293l-4.785-4.785c-.39-.39-.39-1.023 0-1.414s1.023-.39 1.414 0l3.946 3.945L18.075 4.41c.32-.45.94-.558 1.395-.24.45.318.56.942.24 1.394L9.817 19.577c-.17.24-.438.395-.732.42-.028.002-.057.003-.085.003z"></path>
+                  </g>
+                </svg>
+              </div>
+              <div className="bottom">
+                <div>Add an existing account</div>
+                <div onClick={() => authService.signOut()}>
+                  Log out @{user.uid.substr(0, 18)}...
+                </div>
+              </div>
+            </UserModal>
+          )}
           <div className="header-top">
             <h1>
               <Link to="/home" className="border--radius__max">
@@ -615,16 +624,16 @@ const HomePage = ({ user }) => {
                 </div>
               </Link>
             </nav>
-            <div
-              className="tweet-btn border--radius__max"
-              onClick={(e) => handleTab(e, 'nweet')}
+            <Button
+              className="default-btn tweet-btn border--radius__max"
+              onClick={() => handleTab('nweet')}
             >
               Nweet
-            </div>
+            </Button>
           </div>
           <div
             className="header-bottom border--radius__max"
-            onClick={(e) => handleTab(e, 'user')}
+            onClick={() => handleTab('user')}
           >
             <img src={user.img} alt="" className="border--radius__max" />
             <UserInfo className="userinfo">
@@ -718,14 +727,14 @@ const HomePage = ({ user }) => {
                     </div>
                   </div>
                   <div>
-                    <button
+                    <Button
                       type="button"
                       className="default-btn border--radius__max"
                       onClick={handleTweet}
                       disabled={!tweet}
                     >
                       Nweet
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
