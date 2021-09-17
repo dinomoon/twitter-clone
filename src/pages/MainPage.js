@@ -560,7 +560,7 @@ const MainPage = () => {
                 </a>
               </li>
             </ul>
-            <span>&copy; {new Date().getFullYear()} Twitter, Inc.</span>
+            <span>&copy; {new Date().getFullYear()} Nwitter, Inc.</span>
           </nav>
         </Footer>
       </Wrapper>

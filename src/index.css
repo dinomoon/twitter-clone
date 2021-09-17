@@ -68,10 +68,19 @@ a {
   z-index: 8999;
 }
 
+#modal-background.more-modal-bg {
+  z-index: 9001;
+}
+
 #nweet-modal {
   z-index: 9999;
 }
 
-#user-modal {
-  z-index: 9999;
+.svg-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 50%;
 }

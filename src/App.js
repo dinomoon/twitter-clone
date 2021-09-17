@@ -12,10 +12,13 @@ function App() {
     authService.onAuthStateChanged((user) => {
       if (user) {
         history.push('/home');
+
         setUser({
-          name: user.displayName,
+          name: user.displayName || 'Guest',
           uid: user.uid,
-          img: user.photoURL,
+          img:
+            user.photoURL ||
+            'https://pbs.twimg.com/profile_images/1386733982637645824/JJA95cnC_200x200.png',
         });
       } else {
         history.push('/');
