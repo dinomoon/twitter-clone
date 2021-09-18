@@ -65,6 +65,14 @@ const Wrapper = styled.div`
       }
     }
 
+    .nweet-img {
+      width: 506px;
+      height: 282px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      margin: 1rem 0 4px 0;
+    }
+
     .icons {
       width: 425px;
       display: flex;
@@ -117,7 +125,6 @@ const MoreModal = styled.div`
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   background-color: #fff;
   font-size: 15px;
-  z-index: 9999;
   .row {
     display: flex;
     align-items: center;
@@ -141,18 +148,18 @@ const MoreModal = styled.div`
   }
 `;
 
-const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
+const Nweet = ({ nweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
   const handleMoreOpen = () => {
-    handleTab('more', tweet.id);
+    handleTab('more', nweet.id);
   };
   const handleDelete = () => {
-    dbService.doc(`tweets/${tweet.id}`).delete();
-    handleTab('more', tweet.id);
+    dbService.doc(`nweets/${nweet.id}`).delete();
+    handleTab('more', nweet.id);
   };
   return (
-    <Wrapper opened={openMoreTweetId === tweet.id && tabState.more}>
-      {openMoreTweetId === tweet.id && tabState.more && (
-        <MoreModal>
+    <Wrapper opened={openMoreTweetId === nweet.id && tabState.more}>
+      {openMoreTweetId === nweet.id && tabState.more && (
+        <MoreModal id="more-modal">
           {isOwner ? (
             <>
               <div className="row delete" onClick={handleDelete}>
@@ -223,7 +230,7 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
                     <path d="M23.152 3.483h-2.675V.81c0-.415-.336-.75-.75-.75s-.75.335-.75.75v2.674H16.3c-.413 0-.75.336-.75.75s.337.75.75.75h2.677V7.66c0 .413.336.75.75.75s.75-.337.75-.75V4.982h2.675c.414 0 .75-.336.75-.75s-.336-.75-.75-.75zM8.417 11.816c1.355 0 2.872-.15 3.84-1.256.813-.93 1.077-2.367.806-4.392-.38-2.826-2.116-4.513-4.646-4.513S4.15 3.342 3.77 6.168c-.27 2.025-.007 3.462.807 4.393.968 1.108 2.485 1.257 3.84 1.257zm-3.16-5.448c.16-1.2.786-3.212 3.16-3.212 2.373 0 2.998 2.013 3.16 3.212.207 1.55.056 2.627-.45 3.205-.455.52-1.266.743-2.71.743s-2.256-.223-2.71-.743c-.507-.578-.658-1.656-.45-3.205zm11.44 12.867c-.88-3.525-4.283-5.988-8.28-5.988-3.998 0-7.403 2.463-8.28 5.988-.172.693-.03 1.4.395 1.94.408.522 1.04.822 1.733.822H14.57c.69 0 1.323-.3 1.73-.82.425-.54.568-1.247.396-1.942zm-1.577 1.018c-.126.16-.316.245-.55.245H2.264c-.235 0-.426-.085-.552-.246-.137-.174-.18-.412-.12-.654.71-2.855 3.517-4.85 6.824-4.85s6.113 1.994 6.824 4.85c.06.24.017.48-.12.655z"></path>
                   </g>
                 </svg>
-                <div>Follow at @{tweet.creatorId.substr(0, 12)}</div>
+                <div>Follow at @{nweet.creatorId.substr(0, 12)}</div>
               </div>
               <div className="row">
                 <svg viewBox="0 0 24 24">
@@ -233,7 +240,7 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
                   </g>
                 </svg>
                 <div>
-                  Add/remove @{tweet.creatorId.substr(0, 12)} from lists
+                  Add/remove @{nweet.creatorId.substr(0, 12)} from lists
                 </div>
               </div>
               <div className="row">
@@ -242,7 +249,7 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
                     <path d="M1.75 22.354c-.192 0-.384-.073-.53-.22-.293-.293-.293-.768 0-1.06L20.395 1.898c.293-.294.768-.294 1.06 0s.294.767 0 1.06L2.28 22.135c-.146.146-.338.22-.53.22zm1.716-5.577c-.134 0-.27-.036-.392-.11-.67-.413-1.07-1.13-1.07-1.917v-5.5c0-1.24 1.01-2.25 2.25-2.25H6.74l7.047-5.588c.225-.18.533-.215.792-.087.258.125.423.387.423.675v3.28c0 .415-.336.75-.75.75s-.75-.335-.75-.75V3.553L7.47 8.338c-.134.104-.298.162-.467.162h-2.75c-.413 0-.75.337-.75.75v5.5c0 .263.134.5.356.64.353.216.462.678.245 1.03-.14.23-.387.357-.64.357zm10.787 5.973c-.166 0-.33-.055-.466-.162l-4.795-3.803c-.325-.258-.38-.73-.122-1.054.258-.322.73-.38 1.054-.12l3.58 2.838v-7.013c0-.414.335-.75.75-.75s.75.336.75.75V22c0 .288-.166.55-.425.675-.104.05-.216.075-.327.075z"></path>
                   </g>
                 </svg>
-                <div>Mute @{tweet.creatorId.substr(0, 12)}</div>
+                <div>Mute @{nweet.creatorId.substr(0, 12)}</div>
               </div>
               <div className="row">
                 <svg viewBox="0 0 24 24">
@@ -250,7 +257,7 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
                     <path d="M12 1.25C6.072 1.25 1.25 6.072 1.25 12S6.072 22.75 12 22.75 22.75 17.928 22.75 12 17.928 1.25 12 1.25zm0 1.5c2.28 0 4.368.834 5.982 2.207L4.957 17.982C3.584 16.368 2.75 14.282 2.75 12c0-5.1 4.15-9.25 9.25-9.25zm0 18.5c-2.28 0-4.368-.834-5.982-2.207L19.043 6.018c1.373 1.614 2.207 3.7 2.207 5.982 0 5.1-4.15 9.25-9.25 9.25z"></path>
                   </g>
                 </svg>
-                <div>Block @{tweet.creatorId.substr(0, 12)}</div>
+                <div>Block @{nweet.creatorId.substr(0, 12)}</div>
               </div>
               <div className="row">
                 <svg viewBox="0 0 24 24">
@@ -273,16 +280,16 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
         </MoreModal>
       )}
       <div className="left">
-        <img src={tweet.img} alt="" className="border--radius__max" />
+        <img src={nweet.img} alt="" className="border--radius__max" />
       </div>
       <div className="right">
         <div className="top">
           <div>
-            <span className="name">{tweet.name}</span>
-            <span className="id">@{tweet.creatorId}</span>
+            <span className="name">{nweet.name}</span>
+            <span className="id">@{nweet.creatorId}</span>
           </div>
           <span
-            id={tweet.id}
+            id={nweet.id}
             className="more border--radius__max"
             onClick={handleMoreOpen}
           >
@@ -295,7 +302,10 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
             </svg>
           </span>
         </div>
-        <div>{tweet.text}</div>
+        <div>{nweet.text}</div>
+        {nweet.attachmentUrl && (
+          <img src={nweet.attachmentUrl} alt="" className="nweet-img" />
+        )}
         <div className="icons">
           <div className="border--radius__max">
             <svg viewBox="0 0 24 24">
@@ -339,4 +349,4 @@ const Tweet = ({ tweet, handleTab, tabState, openMoreTweetId, isOwner }) => {
   );
 };
 
-export default Tweet;
+export default Nweet;

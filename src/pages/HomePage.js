@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import oc from 'open-color';
 import { Link } from 'react-router-dom';
 import { authService, dbService } from '../fbase';
-import Tweet from '../components/Tweet';
+import Nweet from '../components/Nweet';
 import palette from '../lib/styles/palette';
 import Button from '../components/common/Button';
 
@@ -50,6 +50,34 @@ const NweetForm = styled.div`
         font-size: 20px;
       }
     }
+    .attachment {
+      position: relative;
+      width: 506px;
+      height: 282px;
+      margin-bottom: 1rem;
+      img {
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+      }
+      .svg-wrapper {
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        width: 30px;
+        height: 30px;
+        z-index: 10;
+        background-color: ${oc.gray[9]};
+        svg {
+          width: 18px;
+          height: 18px;
+          fill: #fff;
+        }
+        &:hover {
+          background-color: ${oc.gray[8]};
+        }
+      }
+    }
     .bottom {
       display: flex;
       justify-content: space-between;
@@ -73,6 +101,20 @@ const NweetForm = styled.div`
           &:hover {
             background-color: ${oc.orange[0]};
           }
+        }
+        label {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 34px;
+          height: 34px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .file-input {
+          position: absolute;
+          width: 1px;
+          height: 1px;
         }
       }
       button {
@@ -119,7 +161,6 @@ const Header = styled.header`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  z-index: 9000;
   h1 {
     display: flex;
     justify-content: center;
@@ -177,7 +218,7 @@ const Header = styled.header`
     }
   }
 
-  .tweet-btn {
+  .nweet-btn {
     width: 85%;
     height: 52px;
     margin-top: 1rem;
@@ -234,7 +275,7 @@ const Main = styled.main`
         padding: 0;
         font-size: 20px;
       }
-      .top-tweets {
+      .top-nweets {
         width: 34px;
         height: 34px;
         display: flex;
@@ -454,6 +495,7 @@ const UserModal = styled.div`
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   background-color: #fff;
   font-size: 15px;
+  z-index: 9999;
   .top {
     display: flex;
     align-items: center;
@@ -514,66 +556,85 @@ const NweetModal = styled.div`
 `;
 
 const HomePage = ({ user }) => {
-  const [tweet, setTweet] = useState('');
-  const [tweets, setTweets] = useState([]);
+  const [nweet, setNweet] = useState('');
+  const [nweets, setNweets] = useState([]);
   const [tabState, setTabState] = useState({
     user: false,
     nweet: false,
     more: false,
   });
   const [openMoreTweetId, setOpenMoreTweetId] = useState(null);
+  const [attachment, setAttachment] = useState(null);
 
   useEffect(() => {
-    dbService.collection('tweets').onSnapshot((s) => {
+    dbService.collection('nweets').onSnapshot((s) => {
       const arr = s.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setTweets(arr);
+      setNweets(arr);
     });
-  }, [setTweets]);
+  }, [setNweets]);
 
-  const handleTweet = async () => {
+  const handleNweet = async () => {
     if (tabState.nweet) {
       handleTab('nweet');
     }
-    setTweet('');
-    await dbService.collection('tweets').add({
-      text: tweet,
+    setNweet('');
+    setAttachment(null);
+    await dbService.collection('nweets').add({
+      text: nweet,
       createdAt: new Date(),
       creatorId: user.uid,
       img: user.img,
       name: user.name,
+      attachmentUrl: attachment,
     });
   };
 
   const handleTab = (type, tweetId) => {
-    let $modalBackground;
+    const $modalBackground = document.querySelector('#modal-background');
+    $modalBackground.classList.toggle('show');
 
-    switch (type) {
-      case 'user':
-        $modalBackground = document.querySelector('.user-modal-bg');
-        $modalBackground.classList.toggle('show');
-        break;
-      case 'nweet':
-        $modalBackground = document.querySelector('.nweet-modal-bg');
-        $modalBackground.classList.toggle('show');
-        $modalBackground.classList.toggle('shadow');
-        setTweet('');
-        break;
-      case 'more':
-        $modalBackground = document.querySelector('.more-modal-bg');
-        $modalBackground.classList.toggle('show');
-        tweetId && setOpenMoreTweetId(tweetId);
-        break;
-      default:
-        return;
+    // modal background를 클릭했을 때 (모달 닫기)
+    if (!type) {
+      for (let x in tabState) {
+        if (tabState[x]) {
+          type = x;
+        }
+      }
     }
 
+    // 모달 상태 관리 (열고 닫을 때)
     setTabState((prev) => ({
       ...prev,
       [type]: !prev[type],
     }));
+
+    // type이 nweet이거나 more일 때는 추가 작업
+    switch (type) {
+      case 'nweet':
+        $modalBackground.classList.toggle('shadow');
+        setNweet('');
+        break;
+      case 'more':
+        setOpenMoreTweetId(tweetId);
+        break;
+      default:
+        return;
+    }
+  };
+
+  const onFileChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = (e) => {
+      const { result } = e.target;
+      setAttachment(result);
+    };
+    if (file && file.type.match('image.*')) {
+      reader.readAsDataURL(file);
+    }
   };
 
   if (!user) {
@@ -590,21 +651,7 @@ const HomePage = ({ user }) => {
 
   return (
     <>
-      <div
-        id="modal-background"
-        className="nweet-modal-bg"
-        onClick={() => handleTab('nweet')}
-      ></div>
-      <div
-        id="modal-background"
-        className="user-modal-bg"
-        onClick={() => handleTab('user')}
-      ></div>
-      <div
-        id="modal-background"
-        className="more-modal-bg"
-        onClick={() => handleTab('more')}
-      ></div>
+      <div id="modal-background" onClick={() => handleTab()}></div>
       {tabState.nweet && (
         <NweetModal id="nweet-modal">
           <div className="close">
@@ -619,7 +666,7 @@ const HomePage = ({ user }) => {
               </svg>
             </span>
           </div>
-          <NweetForm modal={true}>
+          <NweetForm modal>
             <div className="left">
               <img src={user.img} alt="" className="border--radius__max" />
             </div>
@@ -627,10 +674,11 @@ const HomePage = ({ user }) => {
               <div className="top">
                 {/* <div contentEditable placeholder="What's happening?"></div> */}
                 <input
+                  id="nweet-modal-input"
                   type="text"
                   placeholder="What's happening?"
-                  value={tweet}
-                  onChange={(e) => setTweet(e.target.value)}
+                  value={nweet}
+                  onChange={(e) => setNweet(e.target.value)}
                 />
               </div>
               <div className="bottom">
@@ -683,8 +731,8 @@ const HomePage = ({ user }) => {
                   <Button
                     type="button"
                     className="default-btn border--radius__max"
-                    onClick={handleTweet}
-                    disabled={!tweet}
+                    onClick={handleNweet}
+                    disabled={!nweet}
                   >
                     Nweet
                   </Button>
@@ -696,29 +744,29 @@ const HomePage = ({ user }) => {
       )}
       <Wrapper>
         {/* Header */}
+        {tabState.user && (
+          <UserModal id="user-modal">
+            <div className="top">
+              <img src={user.img} alt="" className="border--radius__max" />
+              <UserInfo className="userinfo">
+                <div className="name">{user.name}</div>
+                <div className="uid">@{user.uid.substr(0, 10)}...</div>
+              </UserInfo>
+              <svg viewBox="0 0 24 24">
+                <g>
+                  <path d="M9 20c-.264 0-.52-.104-.707-.293l-4.785-4.785c-.39-.39-.39-1.023 0-1.414s1.023-.39 1.414 0l3.946 3.945L18.075 4.41c.32-.45.94-.558 1.395-.24.45.318.56.942.24 1.394L9.817 19.577c-.17.24-.438.395-.732.42-.028.002-.057.003-.085.003z"></path>
+                </g>
+              </svg>
+            </div>
+            <div className="bottom">
+              <div>Add an existing account</div>
+              <div onClick={() => authService.signOut()}>
+                Log out @{user.uid.substr(0, 18)}...
+              </div>
+            </div>
+          </UserModal>
+        )}
         <Header role="banner">
-          {tabState.user && (
-            <UserModal id="user-modal">
-              <div className="top">
-                <img src={user.img} alt="" className="border--radius__max" />
-                <UserInfo className="userinfo">
-                  <div className="name">{user.name}</div>
-                  <div className="uid">@{user.uid.substr(0, 10)}...</div>
-                </UserInfo>
-                <svg viewBox="0 0 24 24">
-                  <g>
-                    <path d="M9 20c-.264 0-.52-.104-.707-.293l-4.785-4.785c-.39-.39-.39-1.023 0-1.414s1.023-.39 1.414 0l3.946 3.945L18.075 4.41c.32-.45.94-.558 1.395-.24.45.318.56.942.24 1.394L9.817 19.577c-.17.24-.438.395-.732.42-.028.002-.057.003-.085.003z"></path>
-                  </g>
-                </svg>
-              </div>
-              <div className="bottom">
-                <div>Add an existing account</div>
-                <div onClick={() => authService.signOut()}>
-                  Log out @{user.uid.substr(0, 18)}...
-                </div>
-              </div>
-            </UserModal>
-          )}
           <div className="header-top">
             <h1>
               <Link to="/home" className="border--radius__max">
@@ -816,7 +864,7 @@ const HomePage = ({ user }) => {
               </Link>
             </nav>
             <Button
-              className="default-btn tweet-btn border--radius__max"
+              className="default-btn nweet-btn border--radius__max"
               onClick={() => handleTab('nweet')}
             >
               Nweet
@@ -848,7 +896,7 @@ const HomePage = ({ user }) => {
             {/* home */}
             <div className="home">
               <h2>Home</h2>
-              <div className="top-tweets border--radius__max">
+              <div className="top-nweets border--radius__max">
                 <svg viewBox="0 0 24 24">
                   <g>
                     <path d="M22.772 10.506l-5.618-2.192-2.16-6.5c-.102-.307-.39-.514-.712-.514s-.61.207-.712.513l-2.16 6.5-5.62 2.192c-.287.112-.477.39-.477.7s.19.585.478.698l5.62 2.192 2.16 6.5c.102.306.39.513.712.513s.61-.207.712-.513l2.16-6.5 5.62-2.192c.287-.112.477-.39.477-.7s-.19-.585-.478-.697zm-6.49 2.32c-.208.08-.37.25-.44.46l-1.56 4.695-1.56-4.693c-.07-.21-.23-.38-.438-.462l-4.155-1.62 4.154-1.622c.208-.08.37-.25.44-.462l1.56-4.693 1.56 4.694c.07.212.23.382.438.463l4.155 1.62-4.155 1.622zM6.663 3.812h-1.88V2.05c0-.414-.337-.75-.75-.75s-.75.336-.75.75v1.762H1.5c-.414 0-.75.336-.75.75s.336.75.75.75h1.782v1.762c0 .414.336.75.75.75s.75-.336.75-.75V5.312h1.88c.415 0 .75-.336.75-.75s-.335-.75-.75-.75zm2.535 15.622h-1.1v-1.016c0-.414-.335-.75-.75-.75s-.75.336-.75.75v1.016H5.57c-.414 0-.75.336-.75.75s.336.75.75.75H6.6v1.016c0 .414.335.75.75.75s.75-.336.75-.75v-1.016h1.098c.414 0 .75-.336.75-.75s-.336-.75-.75-.75z"></path>
@@ -867,19 +915,44 @@ const HomePage = ({ user }) => {
                   <input
                     type="text"
                     placeholder="What's happening?"
-                    value={tweet}
-                    onChange={(e) => setTweet(e.target.value)}
+                    value={nweet}
+                    onChange={(e) => setNweet(e.target.value)}
                   />
                 </div>
+                {attachment && (
+                  <div className="attachment">
+                    <img src={attachment} alt="" className="nweet-img" />
+                    <div
+                      className="svg-wrapper"
+                      onClick={() => setAttachment(null)}
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <g>
+                          <path d="M13.414 12l5.793-5.793c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0L12 10.586 6.207 4.793c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414L10.586 12l-5.793 5.793c-.39.39-.39 1.023 0 1.414.195.195.45.293.707.293s.512-.098.707-.293L12 13.414l5.793 5.793c.195.195.45.293.707.293s.512-.098.707-.293c.39-.39.39-1.023 0-1.414L13.414 12z"></path>
+                        </g>
+                      </svg>
+                    </div>
+                  </div>
+                )}
                 <div className="bottom">
                   <div className="icons">
                     <div className="border--radius__max">
-                      <svg viewBox="0 0 24 24" className="twitter-svg">
-                        <g>
-                          <path d="M19.75 2H4.25C3.01 2 2 3.01 2 4.25v15.5C2 20.99 3.01 22 4.25 22h15.5c1.24 0 2.25-1.01 2.25-2.25V4.25C22 3.01 20.99 2 19.75 2zM4.25 3.5h15.5c.413 0 .75.337.75.75v9.676l-3.858-3.858c-.14-.14-.33-.22-.53-.22h-.003c-.2 0-.393.08-.532.224l-4.317 4.384-1.813-1.806c-.14-.14-.33-.22-.53-.22-.193-.03-.395.08-.535.227L3.5 17.642V4.25c0-.413.337-.75.75-.75zm-.744 16.28l5.418-5.534 6.282 6.254H4.25c-.402 0-.727-.322-.744-.72zm16.244.72h-2.42l-5.007-4.987 3.792-3.85 4.385 4.384v3.703c0 .413-.337.75-.75.75z"></path>
-                          <circle cx="8.868" cy="8.309" r="1.542"></circle>
-                        </g>
-                      </svg>
+                      <input
+                        id="file"
+                        type="file"
+                        className="file-input"
+                        accept="image/*"
+                        onChange={onFileChange}
+                        multiple
+                      />
+                      <label htmlFor="file">
+                        <svg viewBox="0 0 24 24" className="twitter-svg">
+                          <g>
+                            <path d="M19.75 2H4.25C3.01 2 2 3.01 2 4.25v15.5C2 20.99 3.01 22 4.25 22h15.5c1.24 0 2.25-1.01 2.25-2.25V4.25C22 3.01 20.99 2 19.75 2zM4.25 3.5h15.5c.413 0 .75.337.75.75v9.676l-3.858-3.858c-.14-.14-.33-.22-.53-.22h-.003c-.2 0-.393.08-.532.224l-4.317 4.384-1.813-1.806c-.14-.14-.33-.22-.53-.22-.193-.03-.395.08-.535.227L3.5 17.642V4.25c0-.413.337-.75.75-.75zm-.744 16.28l5.418-5.534 6.282 6.254H4.25c-.402 0-.727-.322-.744-.72zm16.244.72h-2.42l-5.007-4.987 3.792-3.85 4.385 4.384v3.703c0 .413-.337.75-.75.75z"></path>
+                            <circle cx="8.868" cy="8.309" r="1.542"></circle>
+                          </g>
+                        </svg>
+                      </label>
                     </div>
                     <div className="border--radius__max">
                       <svg viewBox="0 0 24 24" className="twitter-svg">
@@ -921,8 +994,8 @@ const HomePage = ({ user }) => {
                     <Button
                       type="button"
                       className="default-btn border--radius__max"
-                      onClick={handleTweet}
-                      disabled={!tweet}
+                      onClick={handleNweet}
+                      disabled={!nweet && !attachment}
                     >
                       Nweet
                     </Button>
@@ -932,14 +1005,14 @@ const HomePage = ({ user }) => {
             </NweetForm>
             {/* Tweets */}
             <section>
-              {tweets.map((tweet) => (
-                <Tweet
-                  key={tweet.id}
-                  tweet={tweet}
+              {nweets.map((nweet) => (
+                <Nweet
+                  key={nweet.id}
+                  nweet={nweet}
                   handleTab={handleTab}
                   tabState={tabState}
                   openMoreTweetId={openMoreTweetId}
-                  isOwner={tweet.creatorId === user.uid}
+                  isOwner={nweet.creatorId === user.uid}
                 />
               ))}
             </section>
