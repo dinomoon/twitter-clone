@@ -1,3 +1,5 @@
+$borderColor: #eff3f4;
+
 * {
   box-sizing: border-box;
 }
@@ -14,6 +16,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.overflow-hidden {
+  overflow: hidden;
 }
 
 #root {
@@ -35,6 +41,31 @@ li {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+.container {
+  position: relative;
+  width: 1265px;
+  margin: 0 auto;
+}
+
+main.home {
+  width: 990px;
+  min-height: 100vh;
+  margin-left: 275px;
+  display: flex;
+  justify-content: space-between;
+
+  .primary-column {
+    width: 600px;
+    border-left: 1px solid $borderColor;
+    border-right: 1px solid $borderColor;
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-column {
+    width: 350px;
+  }
 }
 
 .border--radius__max {
@@ -82,4 +113,10 @@ a {
 
 .nweet-img {
   object-fit: cover;
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
 }
