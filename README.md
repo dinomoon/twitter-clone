@@ -2,6 +2,8 @@
 
 [Thanks to nomadcoders](https://nomadcoders.co/nwitter)
 
+<br>
+
 ## 🔗 Demo
 
 https://dinomoon.github.io/
@@ -54,6 +56,8 @@ https://dinomoon.github.io/
 - [x] open-color
 - [x] styled-components
 
+<br>
+
 ## ⚙ Features
 
 ### 1. 인증
@@ -73,3 +77,5 @@ https://dinomoon.github.io/
 ### 3. 유저
 
 - name, bio, image 수정 기능
+
+![image](https://user-images.githubusercontent.com/42693257/138046819-71568a80-2926-4d3d-9783-d313d20f1755.png)
