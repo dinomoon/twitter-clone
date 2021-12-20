@@ -1,6 +1,6 @@
 # Twitter Clone
 
-[Thanks to nomadcoders](https://nomadcoders.co/nwitter)
+[twitter_clone Contest](https://nomadcoders.co/community/thread/1166)
 
 <br>
 
