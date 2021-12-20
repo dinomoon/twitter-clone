@@ -6,12 +6,6 @@
 
 <br>
 
-## 🔗 Demo
-
-https://dinomoon.github.io/twitter-clone/
-
-<br>
-
 ## 💻 Preview
 
 <br>
