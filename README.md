@@ -1,4 +1,4 @@
-# Twitter Clone
+# twitter-clone contest
 
 [twitter_clone Contest](https://nomadcoders.co/community/thread/1166)
 
