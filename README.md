@@ -1,6 +1,8 @@
 # twitter-clone contest
 
-[twitter_clone Contest](https://nomadcoders.co/community/thread/1166)
+[천하제일 트위터 클론코딩 컨테스트](https://nomadcoders.co/community/thread/1277)
+<br>
+[한 땀 한 땀 정성들여 만든 Twitter 싱크로율 99% Nwitter](https://nomadcoders.co/community/thread/1166)
 
 <br>
 
